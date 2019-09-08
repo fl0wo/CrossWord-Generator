@@ -9,6 +9,13 @@ class Crossword {
   List<List<String>> _board;
   List<List<num>> _hWords;
   List<List<num>> _vWords;
+
+  List<String> usedWords;
+
+  List<Tuple4<num, num, num, num>> _starts;
+
+  num _nBlockInserted = 0;
+
   num _n;
   num _m;
   num _hCount, _vCount;
@@ -26,6 +33,9 @@ class Crossword {
     _board = new List<List<String>>(xDimen);
     _hWords = new List<List<num>>(xDimen);
     _vWords = new List<List<num>>(xDimen);
+    usedWords = new List<String>();
+
+    _starts = new List<Tuple4<num, num, num, num>>();
 
     for (var i = 0; i < _n; i++) {
       _board[i] = new List<String>(yDimen);
@@ -109,7 +119,12 @@ class Crossword {
   }
 
   void putWord(String word, num x, num y, num dir, num value) {
+    if (usedWords.contains(word)) return;
     var mat = dir == 0 ? _hWords : _vWords;
+
+    usedWords.add(word);
+    _nBlockInserted++;
+    _starts.add(new Tuple4(x, y, dir, word.length));
 
     for (var i = 0; i < word.length; i++) {
       num x1 = x + _dirX[dir] * i, y1 = y + _dirY[dir] * i;
@@ -276,5 +291,13 @@ class Crossword {
           (_board[x1][y1] != ' ' || _board[x1][y1] == '*')) return true;
     }
     return false;
+  }
+
+  bool isCompleted() {
+    return (this.getN() * this.getM()) - this._nBlockInserted < 10;
+  }
+
+  List<Tuple4<num, num, num, num>> getStarts() {
+    return this._starts;
   }
 }

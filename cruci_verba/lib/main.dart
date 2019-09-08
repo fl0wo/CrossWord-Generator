@@ -1,8 +1,15 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
 
-import 'classes/Cell.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'classes/CrossWord.dart';
+import 'classes/Record.dart';
 import 'helpers/MyDrawerHelper.dart';
+
+import 'dart:convert';
+import 'dart:io';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 
 void main() => runApp(MyApp());
 
@@ -31,33 +38,112 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  String fileReaded;
+
   @override
   Widget build(BuildContext context) {
-    randomizePositions();
+    widget.c = new Crossword(10, 10);
+    widget.c.reset();
 
     double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
 
-    var row = MyDrawerHelper.getRowsInSquare(context, width, widget.c);
+    return FutureBuilder(
+        future: _read(context, "data/data.json")
+            .then(parseWords)
+            .then((response) => response),
+        builder: (context, data) {
+          if (data.data == null) {
+            print(" Cruciverba : \n " + widget.c.toString());
 
-    print(" Cruciverba : \n " + widget.c.toString());
+            var row = MyDrawerHelper.getRowsInSquare(context, width, widget.c);
 
-    return Scaffold(
-      body: Center(
-        child: Stack(
-          children: row,
-        ),
-      ),
-    );
+            row.add(Positioned(
+                top: height / 2,
+                left: width / 2,
+                child: FlatButton(
+                  child: Text("BTN"),
+                  onPressed: () {},
+                )));
+
+            return Scaffold(
+              body: Center(
+                child: Stack(
+                  children: row,
+                ),
+              ),
+            );
+          } else {
+            return Scaffold(
+                body: Center(
+              child: new SizedBox(
+                height: 50.0,
+                width: 50.0,
+                child: new CircularProgressIndicator(
+                  value: null,
+                  strokeWidth: 7.0,
+                ),
+              ),
+            ));
+          }
+        });
   }
 
-  void randomizePositions() {
-    widget.c = new Crossword(20, 40);
+  void actualizeData() {
+    var count = widget.c.getN() * widget.c.getM();
 
-    genCrossword();
+    var board = widget.c.getBoard();
+    var p = 0;
+
+    for (var i = 0; i < widget.c.getN(); i++) {
+      for (var j = 0; j < widget.c.getM(); j++) {
+        var letter = board[i][j] == '*' ? ' ' : board[i][j];
+
+        if (letter != ' ') count--;
+
+        p++;
+      }
+    }
   }
 
-  void genCrossword() {
-    widget.c.reset();
+  Future<void> parseWords(String s) async {
+    List<dynamic> data;
+
+    data = json.decode(s);
+
+    num i = 0;
+
+    data.shuffle();
+
+    data.forEach((record) {
+      String parola = record["nome"].toString().toLowerCase();
+
+      if (!widget.c.isCompleted() /*i++ < 9000*/) {
+        if (widget.c.addWord(parola) == 0) {
+          // orrizzontale
+        } else if (widget.c.addWord(parola) == 1) {
+          // verticale
+        } else {
+          // non usata
+        }
+      } else {
+        return;
+      }
+    });
+
+    actualizeData();
+  }
+
+  Future<String> _read(BuildContext context, String name) async {
+    return DefaultAssetBundle.of(context).loadString(p.join('assets/', name));
+    // .then(parseWords);
+  }
+}
+
+/*
+
+    // num t1 = new DateTime.now().millisecondsSinceEpoch;
+
 
     List<String> parole = [
       "a",
@@ -1221,43 +1307,5 @@ class _MyHomePageState extends State<MyHomePage> {
       "zitto",
       "zona"
     ];
-
-    parole.shuffle();
-
-    parole.forEach((parola) => {
-          if (widget.c.addWord(parola) == 0)
-            {
-//                        horizontalWordsListView.Items.Add(word);
-            }
-          else if (widget.c.addWord(parola) == 1)
-            {
-              // verticalWordsListView.Items.Add(word);
-            }
-          else
-            {
-              //             notUsedListView.Items.Add(word);
-            }
-        });
-
-    actualizeData();
-  }
-
-  void actualizeData() {
-    var count = widget.c.getN() * widget.c.getM();
-
-    var board = widget.c.getBoard();
-    var p = 0;
-
-    for (var i = 0; i < widget.c.getN(); i++) {
-      for (var j = 0; j < widget.c.getM(); j++) {
-        var letter = board[i][j] == '*' ? ' ' : board[i][j];
-
-        if (letter != ' ') count--;
-
-        p++;
-      }
-    }
-
-    //blackSquaresLabel.Content = count.ToString();
-  }
-}
+    
+*/
