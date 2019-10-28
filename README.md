@@ -1,5 +1,7 @@
 # Cruciverba Generator
-CrossWord Generator made in Flutter, takes data from MongoDB Atlas Cluster
+CrossWord Generator made in Flutter, takes data from daja.json
+
+I generated that file with an AI algorithm...
 
 **Given N** (number of row) **and M** (number of column) **it generates a crossword grid!**
 (Using a personal modified version of backtracking algorithm)
