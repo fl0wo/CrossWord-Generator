@@ -9,6 +9,10 @@ I generated that file with an AI algorithm...
 The database is populated with italian words, and definitions!
 Eventualy you can translate them in english or whatever...
 
+## Simple generation : 
+![cruciverba img 1](https://github.com/fl0wo/cruciverba_generator/blob/master/crossword1.png)
+
+
 ### Example of db record :
 ```javascript
 { 
@@ -49,10 +53,6 @@ Eventualy you can translate them in english or whatever...
     ]
 }
 ```
-
-
-## Simple generation : 
-![cruciverba img 1](https://github.com/fl0wo/cruciverba_generator/blob/master/crossword1.png)
 
 ### Complex generation : 
 ![cruciverba img 2](https://github.com/fl0wo/cruciverba_generator/blob/master/crossword2.png)
